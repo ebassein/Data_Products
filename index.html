@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Devloping Data Products Class Project</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Devloping Data Products Class Project">
+  <meta name="author" content="Emma Bassein">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="libraries/widgets/quiz/css/demo.css"></link>
+<link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Devloping Data Products Class Project</h1>
+    <h2>Visualizing and Manipulating HVAC Data</h2>
+    <p>Emma Bassein<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Problem Statement</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>A large part of energy efficiency engineering is analyzing the data from air conditioning units (otherwise known as air handling units or RTUs). Because operation is different at different times of the day and different days of the week, it is imperative to be able to quickly filter and subset the data you are looking at to identify problems.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Data Definitions</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The key data being visualize are all temperatures.</p>
+
+<h4>SAT: Supply Air Temperature.</h4>
+
+<ul>
+<li>This is the temperature of conditioned air being supplied to the space.</li>
+</ul>
+
+<h4>RAT: Return Air Temperature.</h4>
+
+<ul>
+<li>This is the temperature of the air being recycled from the occupied space. It should be about the same as your space set points, so probably between 68 and 72 degrees.</li>
+</ul>
+
+<h4>OAT: Outside Air Temperature. (self explanatory)</h4>
+
+<h4>MAT: Mixed Air Temperature.</h4>
+
+<ul>
+<li>The unit uses something called an economizer to modulate the percentage of return air and supply air that is mixed together before going through the cooling coils. The economizer&#39;s goal is to get the MAT as close to SAT as possible to minimize the work on the refrigerant cycle.</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>App Features</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The app lets you select data from one of two different AHUs. It then graphs a full time series of the data. </p>
+
+<p>The second graph lets you select a specific time range to zoom in on using the date inputs in the side bar</p>
+
+<p>Graph 3 is a plot of all of the variables vs. OAT, and you can filter by day of the week and hour of the day in the side bar.</p>
+
+<p>The fourth graph allows you to plot any two variables against each other and provides the equation for best fit lines. Because many of the trend have a kink in them, I gave the option to break the trend line at a specific OAT so that two different fits could be used.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>R Features</h2>
+  </hgroup>
+  <article data-timings="">
+    <h4>Filtering</h4>
+
+<p>One of the key features is being able to filter by date, time of day and day of week. Here is an example of the code that does that.</p>
+
+<pre><code class="r">  output$subsetChart &lt;- renderPlot({
+        data = melt(datasetInput(), id=&quot;dttm&quot;)
+        graphdata &lt;- data[data$dttm &gt; as.POSIXct(startInput(),format = &quot;%Y-%m-%d&quot;),]
+        graphdata &lt;- graphdata[graphdata$dttm &lt; as.POSIXct(endInput(), format = &quot;%Y-%m-%d&quot;),]
+        p2 &lt;- ggplot(graphdata, aes(dttm, value, color = variable)) + geom_line()
+            #geom_line(aes(y = SAT, col = &quot;SAT&quot;)) + geom_line(aes(y = MAT, col = MAT)),
+        return(p2)
+    })
+</code></pre>
+
+<pre><code>## Error in output$subsetChart &lt;- renderPlot({: object &#39;output&#39; not found
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Future Direction</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>There are several improvements that could be made to the is app, including:</p>
+
+<ul>
+<li>Including OA% directly, which can be calculated using the following equation:</li>
+</ul>
+
+<p>OA% = \(\frac{OAT-RAT}{MAT-RAT}\)</p>
+
+<p>It should be noted that this will become assymptotic as MAT -&gt; RAT</p>
+
+<ul>
+<li>Better layout to align filter options with the appropriate graphs.</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Problem Statement'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Data Definitions'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='App Features'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='R Features'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Future Direction'>
+         5
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  <script src="libraries/widgets/quiz/js/jquery.quiz.js"></script>
+<script src="libraries/widgets/quiz/js/mustache.min.js"></script>
+<script src="libraries/widgets/quiz/js/quiz-app.js"></script>
+
+  <!-- MathJax: Fall back to local if CDN offline but local image fonts are not supported (saves >100MB) -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        processEscapes: true
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <!-- <script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script> -->
+  <script>window.MathJax || document.write('<script type="text/x-mathjax-config">MathJax.Hub.Config({"HTML-CSS":{imageFont:null}});<\/script><script src="libraries/widgets/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"><\/script>')
+</script>
+<!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>

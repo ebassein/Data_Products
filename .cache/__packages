@@ -1,0 +1,9 @@
+base
+shiny
+Rcpp
+rCharts
+ggplot2
+reshape2
+devtools
+slidify
+knitr
